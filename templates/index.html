@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>DiseaseNet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #ff0000;
+            --accent: #ecfdfd;
+            --secondary: #fefefe;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --dark: #083d3f;
+            --text: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--accent), #d9f4f4);
+            color: var(--text);
+            padding: 40px 15px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 38px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: var(--primary);
+        }
+
+        form {
+            background-color: var(--secondary);
+            max-width: 900px;
+            margin: auto;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px var(--shadow);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #f9fafa;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .symptom-search {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .symptoms {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 12px;
+            background: #fcfefe;
+            box-shadow: inset 0 2px 4px var(--shadow);
+        }
+
+        .symptoms label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #0f8b8d, #00b9b1);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #0c6c6e, #019f99);
+            transform: translateY(-2px);
+        }
+
+        .footer-note {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 13px;
+            color: #777;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 28px;
+            }
+
+            form {
+                padding: 25px;
+            }
+
+            .symptoms {
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🩺 DiseaseNet</h1>
+
+    <form action="/predict" method="post" onsubmit="showLoader()">
+
+        <label for="name">👤 Patient Name:</label>
+        <input type="text" name="name" id="name" placeholder="Enter full name" required />
+
+        <label for="age">🎂 Age:</label>
+        <input type="number" name="age" id="age" placeholder="Enter age in years" required />
+
+        <label for="gender">🚻 Gender:</label>
+        <select name="gender" id="gender" required>
+            <option value="">-- Select Gender --</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </select>
+
+        <label for="searchBox">🩹 Search Symptoms:</label>
+        <input type="text" id="searchBox" class="symptom-search" placeholder="Type to search symptoms..." />
+
+        <div class="symptoms" id="symptomList">
+            {% for symptom in symptoms %}
+                <label>
+                    <input type="checkbox" name="symptoms" value="{{ symptom }}">
+                    {{ symptom.replace('_', ' ').capitalize() }}
+                </label>
+            {% endfor %}
+        </div>
+
+        <button type="submit">🔍 Predict & Download Report</button>
+    </form>
+
+    <div class="footer-note">
+        © 2025 DiseaseNet Healthcare System · All Rights Reserved
+    </div>
+
+    <script>
+        const searchBox = document.getElementById('searchBox');
+        const symptomList = document.getElementById('symptomList');
+        const labels = symptomList.getElementsByTagName('label');
+
+        searchBox.addEventListener('input', function () {
+            const filter = this.value.toLowerCase();
+            for (let i = 0; i < labels.length; i++) {
+                const text = labels[i].innerText.toLowerCase();
+                labels[i].style.display = text.includes(filter) ? '' : 'none';
+            }
+        });
+    </script>
+    <!-- Loader -->
+<div id="loader" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.85); z-index:9999; text-align:center;">
+    <div style="position:relative; top:40%;">
+        <div class="spinner"></div>
+        <p style="margin-top:20px; font-size:18px; color:#0f8b8d;">Generating report, please wait...</p>
+    </div>
+</div>
+
+<script>
+    function showLoader() {
+        document.getElementById('loader').style.display = 'block';
+    }
+</script>
+
+<style>
+    .spinner {
+        margin: auto;
+        width: 60px;
+        height: 60px;
+        border: 6px solid #d0f0f0;
+        border-top: 6px solid #0f8b8d;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0%   { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+</body>
+</html>

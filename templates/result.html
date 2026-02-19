@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Result - DiseaseNet</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f8fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #0f8b8d;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-top: 30px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .info p {
+            margin: 5px 0;
+        }
+        .highlight {
+            color: red;
+            font-weight: bold;
+        }
+        .btn {
+            background-color: #0f8b8d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #0c6c6d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🩺 DiseaseNet Prediction Result</h1>
+
+        <div class="info">
+            <p><strong>Name:</strong> {{ name }}</p>
+            <p><strong>Age:</strong> {{ age }}</p>
+            <p><strong>Gender:</strong> {{ gender }}</p>
+        </div>
+
+        <h2>🧾 Selected Symptoms</h2>
+        <ul>
+            {% for symptom in selected_symptoms %}
+                <li>{{ symptom.replace('_', ' ').capitalize() }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>🔍 Predicted Disease</h2>
+        <p class="highlight">{{ predicted_disease }}</p>
+
+        <h2>💊 Recommended Medicines</h2>
+        <ul>
+            {% for medicine in suggested_medicines %}
+                <li>{{ medicine }}</li>
+            {% endfor %}
+        </ul>
+
+        <form action="/download" method="POST">
+            <input type="hidden" name="name" value="{{ name }}">
+            <input type="hidden" name="age" value="{{ age }}">
+            <input type="hidden" name="gender" value="{{ gender }}">
+            <input type="hidden" name="predicted_disease" value="{{ predicted_disease }}">
+            {% for s in selected_symptoms %}
+                <input type="hidden" name="symptoms" value="{{ s }}">
+            {% endfor %}
+            {% for med in suggested_medicines %}
+                <input type="hidden" name="suggested_medicines" value="{{ med }}">
+            {% endfor %}
+            <button type="submit" class="btn">Download PDF Report</button>
+        </form>
+    </div>
+</body>
+</html>
